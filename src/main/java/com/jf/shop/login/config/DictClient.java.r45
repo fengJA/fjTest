@@ -1,0 +1,134 @@
+package com.jf.shop.login.config;
+
+import com.alibaba.fastjson.JSONObject;
+
+import java.io.*;
+import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Scanner;
+import java.util.UUID;
+
+public class DictClient {
+
+    public static final String SERVER = "127.0.0.1";
+    public static final int PORT = 8080;
+    public static final int TIMEOUT = 0;
+    public static boolean flags = true;
+    public static boolean flagss = true;
+
+    public static void main(String[] args) {
+
+        Socket socket = null;
+        try {
+            socket = new Socket(SERVER, PORT);
+            socket.setSoTimeout(TIMEOUT);
+            OutputStream out = socket.getOutputStream();
+            Writer writer = new OutputStreamWriter(out, "UTF-8");
+            writer = new BufferedWriter(writer);
+            InputStream in = socket.getInputStream();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(in, "UTF-8"));
+
+//            for (String word : args) {
+            Writer finalWriter = writer;
+
+
+            //判断与谁通信
+           /* HashMap<String,String> otherClient = new HashMap<>();
+            UUID uuid = UUID.randomUUID();
+            String str = uuid.toString();
+            String connName = "zs";//另一个人的名字
+            otherClient.put(str, connName);*/
+
+            new Thread(){
+                @Override
+                public void run() {
+                    /*System.out.println("请输入名字：");
+                    Scanner scanner = new Scanner(System.in);
+                    String clientName = scanner.next();
+                    System.out.println("名字是" +clientName);*/
+                    try {
+                        define(reader);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+//            }
+
+            //取名字
+            String clientName = null;
+            if (flags){
+                System.out.println("请输入名字：");
+                Scanner scanner = new Scanner(System.in);
+                clientName = scanner.next();
+                System.out.println("名字是" +clientName);
+                writer.write(clientName);
+                writer.flush();
+                flags = false;
+            }
+
+
+//            System.out.println("晓得啥哦");
+            if (flagss){
+                System.out.println("请输入对方的名字");
+                /*InputStreamReader scanners = new InputStreamReader(System.in);
+                BufferedReader br = new BufferedReader(scanners);
+                String otherName = br.readLine();
+                writer.write(otherName);
+                writer.flush();
+                flags = false;*/
+                flagss = false;
+            }
+            InputStreamReader is = new InputStreamReader(System.in); //new构造InputStreamReader对象
+            BufferedReader br = new BufferedReader(is); //拿构造的方法传到BufferedReader中，此时获取到的就是整个缓存流
+            while (true) {
+                String name = br.readLine();
+                Date now = new Date();
+                SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String currentTime = sf.format(now);
+                writer.write(currentTime +"  "+clientName +" ："+name+ "\r\n");
+                writer.flush();
+            }
+
+        } catch (IOException ex) {
+            System.err.println(ex);
+        } finally { // dispose
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException ex) {
+                    // ignore
+                }
+            }
+        }
+    }
+
+    static void define1(String word, Writer writer, BufferedReader reader)
+            throws IOException, UnsupportedEncodingException {
+//        writer.write("DEFINE eng-lat " + word + "\r\n");
+//        writer.flush();
+
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+//            System.out.println("aa="+line);
+//            System.out.println("时间："+System.currentTimeMillis());
+
+            System.out.println(line);
+        }
+    }
+
+    static void define(BufferedReader reader)
+            throws IOException, UnsupportedEncodingException {
+
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+
+            System.out.println(line);
+        }
+    }
+
+    static void otherClient(){
+
+    }
+}
