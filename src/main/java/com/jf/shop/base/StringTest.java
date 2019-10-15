@@ -15,6 +15,7 @@ public class StringTest {
 
     public String name;
     public int age;
+    public string gender;
 
 
     public static void main(String[] args) {
